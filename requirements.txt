@@ -1,0 +1,16 @@
+fastapi
+uvicorn[standard]
+python-multipart
+sqlalchemy
+pymysql
+cryptography
+reportlab
+python-jose[cryptography]
+passlib[bcrypt]
+aiofiles
+jinja2
+tensorflow
+opencv-python-headless
+pyngrok
+numpy
+Pillow

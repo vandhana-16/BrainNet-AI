@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BrainNet AI</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',sans-serif;background:#07090f;color:#cbd5e1;min-height:100vh;}
+.topbar{background:#07090f;border-bottom:0.5px solid rgba(255,255,255,0.07);padding:14px 28px;display:flex;align-items:center;gap:14px;}
+.app-name{font-size:16px;font-weight:700;color:#f1f5f9;}
+.app-sub{font-size:11px;color:#475569;margin-top:1px;}
+.pills{margin-left:auto;display:flex;gap:8px;align-items:center;}
+.pill{font-size:10px;padding:3px 10px;border-radius:20px;font-weight:600;}
+.p1{background:rgba(139,92,246,0.12);color:#a78bfa;border:0.5px solid rgba(139,92,246,0.25);}
+.p2{background:rgba(34,211,238,0.1);color:#22d3ee;border:0.5px solid rgba(34,211,238,0.2);}
+.p3{background:rgba(251,191,36,0.1);color:#fbbf24;border:0.5px solid rgba(251,191,36,0.2);}
+.btn-logout{font-size:11px;padding:4px 12px;border-radius:20px;font-weight:600;background:rgba(248,113,113,0.1);color:#f87171;border:0.5px solid rgba(248,113,113,0.25);cursor:pointer;}
+.main{max-width:1000px;margin:0 auto;padding:24px 20px;}
+.slabel{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;margin-bottom:10px;}
+.upload-zone{border:1px dashed rgba(139,92,246,0.25);border-radius:16px;padding:36px 20px;text-align:center;background:rgba(139,92,246,0.04);margin-bottom:6px;cursor:pointer;transition:border-color 0.2s,background 0.2s;}
+.upload-zone:hover{border-color:rgba(139,92,246,0.5);background:rgba(139,92,246,0.07);}
+.upload-zone.dragover{border-color:#a78bfa;background:rgba(139,92,246,0.09);}
+.upload-title{font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:5px;}
+.upload-sub{font-size:12px;color:#475569;}
+#preview-wrap{margin:14px auto 0;display:none;width:140px;height:140px;border-radius:10px;overflow:hidden;border:0.5px solid rgba(139,92,246,0.25);}
+#preview-wrap img{width:100%;height:100%;object-fit:cover;}
+.btn-scan{background:#7c3aed;color:#ede9fe;border:none;padding:11px 32px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;margin-top:16px;transition:opacity 0.2s;}
+.btn-scan:hover{opacity:0.88;}
+.btn-scan:disabled{opacity:0.35;cursor:not-allowed;}
+.btn-download{background:rgba(34,211,238,0.1);color:#22d3ee;border:0.5px solid rgba(34,211,238,0.3);padding:11px 28px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;transition:opacity 0.2s;}
+.btn-download:hover{opacity:0.85;}
+.btn-row{display:flex;gap:12px;justify-content:center;margin-top:8px;margin-bottom:20px;}
+.spinner{display:none;text-align:center;padding:40px 0;}
+.spin{width:34px;height:34px;border:3px solid rgba(139,92,246,0.15);border-top-color:#a78bfa;border-radius:50%;animation:spin 0.75s linear infinite;margin:0 auto 10px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.spinner p{font-size:12px;color:#475569;}
+.divider{height:0.5px;background:rgba(255,255,255,0.06);margin:20px 0;}
+.results{display:none;}
+.diag-banner{border-radius:14px;padding:18px 22px;margin-bottom:14px;display:flex;align-items:center;gap:16px;background:#0d0b1a;border:0.5px solid rgba(139,92,246,0.25);}
+.diag-icon{width:44px;height:44px;border-radius:12px;background:rgba(139,92,246,0.15);border:0.5px solid rgba(139,92,246,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.diag-lbl{font-size:10px;color:#7c3aed;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;margin-bottom:3px;}
+.diag-val{font-size:24px;font-weight:700;color:#f1f5f9;text-transform:capitalize;}
+.diag-meta{font-size:12px;color:#475569;margin-top:2px;}
+.agree-chip{margin-left:auto;padding:7px 16px;border-radius:20px;font-size:12px;font-weight:700;flex-shrink:0;}
+.chip-yes{background:rgba(52,211,153,0.1);color:#34d399;border:0.5px solid rgba(52,211,153,0.25);}
+.chip-no{background:rgba(248,113,113,0.1);color:#f87171;border:0.5px solid rgba(248,113,113,0.25);}
+.scc-card{border-radius:14px;padding:18px 22px;margin-bottom:14px;background:#0a0b14;border:0.5px solid rgba(34,211,238,0.2);}
+.scc-top{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;}
+.scc-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.scc-name{font-size:13px;font-weight:700;margin-bottom:3px;}
+.scc-tagline{font-size:12px;color:#475569;line-height:1.6;}
+.scc-num{margin-left:auto;text-align:right;flex-shrink:0;}
+.scc-big{font-size:32px;font-weight:700;}
+.scc-unit{font-size:10px;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-top:1px;}
+.meter-wrap{margin-bottom:12px;}
+.meter-labels{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;}
+.meter-bg{height:10px;background:rgba(255,255,255,0.05);border-radius:5px;overflow:hidden;}
+.meter-fill{height:10px;border-radius:5px;transition:width 0.8s ease;}
+.meter-zones{display:flex;margin-top:4px;}
+.zone{flex:1;text-align:center;font-size:9px;font-weight:700;letter-spacing:0.3px;padding:2px 0;}
+.scc-explain{background:rgba(34,211,238,0.04);border:0.5px solid rgba(34,211,238,0.1);border-radius:10px;padding:12px 16px;}
+.scc-explain-title{font-size:10px;color:#22d3ee;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:7px;}
+.scc-explain-text{font-size:12px;color:#64748b;line-height:1.75;}
+.scc-explain-text b{color:#94a3b8;font-weight:600;}
+.models-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.mcard{border-radius:14px;padding:16px 18px;}
+.mcard-eff{background:#0a0d1a;border:0.5px solid rgba(251,191,36,0.2);}
+.mcard-res{background:#0a0d1a;border:0.5px solid rgba(52,211,153,0.2);}
+.mtag{font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:700;margin-bottom:10px;}
+.mtag-eff{color:#fbbf24;}
+.mtag-res{color:#34d399;}
+.mpred{font-size:19px;font-weight:700;color:#f1f5f9;text-transform:capitalize;margin-bottom:2px;}
+.mconf{font-size:12px;color:#475569;margin-bottom:13px;}
+.brow{margin:5px 0;}
+.brow-top{display:flex;justify-content:space-between;font-size:11px;color:#475569;margin-bottom:3px;text-transform:capitalize;}
+.bbg{height:5px;background:rgba(255,255,255,0.05);border-radius:3px;}
+.bfill-eff{height:5px;border-radius:3px;background:#fbbf24;transition:width 0.6s ease;}
+.bdim-eff{height:5px;border-radius:3px;background:rgba(251,191,36,0.2);transition:width 0.6s ease;}
+.bfill-res{height:5px;border-radius:3px;background:#34d399;transition:width 0.6s ease;}
+.bdim-res{height:5px;border-radius:3px;background:rgba(52,211,153,0.2);transition:width 0.6s ease;}
+.cam-card{background:#0a0d1a;border:0.5px solid rgba(255,255,255,0.07);border-radius:14px;padding:16px 18px;margin-bottom:14px;}
+.cam-head{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:3px;}
+.cam-sub{font-size:11px;color:#475569;margin-bottom:14px;}
+.cam-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;}
+.cam-box{aspect-ratio:1;border-radius:10px;overflow:hidden;border:0.5px solid rgba(255,255,255,0.07);}
+.cam-box img{width:100%;height:100%;object-fit:cover;display:block;}
+.cam-lbl{font-size:11px;color:#475569;margin-top:6px;text-align:center;}
+.metrics-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+.metric-card{background:#0a0d1a;border:0.5px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px 16px;}
+.metric-label{font-size:13px;color:#fbbf24;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:6px;font-weight:700;}
+.metric-value{font-size:18px;font-weight:700;color:#f1f5f9;}
+.metric-sub{font-size:11px;color:#475569;margin-top:3px;}
+.quality-good{color:#34d399;}
+.quality-low{color:#f87171;}
+.footer{text-align:center;padding:18px 0 6px;font-size:11px;color:#1e293b;border-top:0.5px solid rgba(255,255,255,0.04);margin-top:6px;}
+@media(max-width:600px){
+  .models-grid{grid-template-columns:1fr;}
+  .cam-grid{grid-template-columns:1fr 1fr;}
+  .metrics-grid{grid-template-columns:1fr 1fr;}
+  .pills{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div>
+    <div class="app-name">&#129504; BrainNet AI</div>
+    <div class="app-sub">Brain tumor MRI analysis &amp; trust scoring</div>
+  </div>
+  <div class="pills">
+    <div class="pill p1">GradCAM++</div>
+    <div class="pill p2">SCC Trust</div>
+    <div class="pill p3">Dual Model</div>
+    <span id="doctor-name" style="font-size:12px;color:#94a3b8;margin-left:8px;"></span>
+    <button class="btn-logout" onclick="logout()">Logout</button>
+  </div>
+</div>
+<div class="main">
+  <div class="slabel" style="color:#7c3aed;">Scan upload</div>
+  <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+    <div class="upload-title">&#128229; Upload MRI scan</div>
+    <div class="upload-sub">JPG or PNG &mdash; axial T1/T2 weighted MRI</div>
+    <div id="preview-wrap"><img id="preview" src="" alt="preview"/></div>
+    <input type="file" id="file-input" accept="image/*" style="display:none" onchange="handleFile(event)"/>
+    <br/>
+    <button class="btn-scan" id="predict-btn" onclick="runPrediction(event)" disabled>Run Analysis</button>
+  </div>
+  <div class="spinner" id="spinner">
+    <div class="spin"></div>
+    <p>Running dual-model analysis and computing SCC&hellip;</p>
+  </div>
+  <div class="results" id="results">
+    <div class="divider"></div>
+    <div class="slabel" style="color:#22d3ee;">Analysis result</div>
+    <div class="diag-banner">
+      <div class="diag-icon">+</div>
+      <div>
+        <div class="diag-lbl">Primary diagnosis</div>
+        <div class="diag-val" id="diag-val"></div>
+        <div class="diag-meta" id="diag-meta"></div>
+      </div>
+      <div class="agree-chip" id="agree-chip"></div>
+    </div>
+    <div class="scc-card">
+      <div class="scc-top">
+        <div class="scc-icon" id="scc-icon"></div>
+        <div>
+          <div class="scc-name" id="scc-name"></div>
+          <div class="scc-tagline" id="scc-tagline"></div>
+        </div>
+        <div class="scc-num">
+          <div class="scc-big" id="scc-big"></div>
+          <div class="scc-unit">SCC score</div>
+        </div>
+      </div>
+      <div class="meter-wrap">
+        <div class="meter-labels">
+          <span style="color:#f87171;">Refer</span>
+          <span style="color:#fbbf24;">Caution</span>
+          <span style="color:#34d399;">Trust</span>
+          <span style="color:#818cf8;">Perfect</span>
+        </div>
+        <div class="meter-bg">
+          <div class="meter-fill" id="meter-fill" style="background:linear-gradient(90deg,#ef4444,#fbbf24 30%,#34d399 60%,#818cf8);"></div>
+        </div>
+        <div class="meter-zones">
+          <div class="zone" style="color:#f87171;border-top:2px solid #ef4444;">0&ndash;0.15</div>
+          <div class="zone" style="color:#fbbf24;border-top:2px solid #fbbf24;">0.15&ndash;0.35</div>
+          <div class="zone" style="color:#34d399;border-top:2px solid #34d399;">0.35&ndash;0.7</div>
+          <div class="zone" style="color:#818cf8;border-top:2px solid #818cf8;">0.7&ndash;1.0</div>
+        </div>
+      </div>
+      <div class="scc-explain">
+        <div class="scc-explain-title">What is SCC &mdash; Spatial Consensus Confidence?</div>
+        <div class="scc-explain-text">
+          Unlike softmax confidence which only measures <b>what</b> a model predicted, SCC measures <b>where</b> both models looked.
+          Each model independently generates a GradCAM++ heatmap. SCC computes the <b>Intersection over Union (IoU)</b> of these two heatmaps.
+          A high score means both models agree on the <b>same suspicious region</b> &mdash; spatially validating the prediction.
+          A low SCC flags the scan for <b>radiologist review</b>, even when softmax confidence appears high.
+        </div>
+      </div>
+    </div>
+    <div class="models-grid">
+      <div class="mcard mcard-eff">
+        <div class="mtag mtag-eff">EfficientNetB0</div>
+        <div class="mpred" id="eff-pred"></div>
+        <div class="mconf" id="eff-conf"></div>
+        <div id="eff-bars"></div>
+      </div>
+      <div class="mcard mcard-res">
+        <div class="mtag mtag-res">ResNet50V2</div>
+        <div class="mpred" id="res-pred"></div>
+        <div class="mconf" id="res-conf"></div>
+        <div id="res-bars"></div>
+      </div>
+    </div>
+    <div class="cam-card">
+      <div class="cam-head">GradCAM++ activation maps</div>
+      <div class="cam-sub">Warmer colours show where each model focused &mdash; red = highest activation</div>
+      <div class="cam-grid">
+        <div><div class="cam-box"><img id="img-orig" src="" alt="Original"/></div><div class="cam-lbl">Original MRI</div></div>
+        <div><div class="cam-box"><img id="img-eff" src="" alt="EfficientNetB0"/></div><div class="cam-lbl">EfficientNetB0</div></div>
+        <div><div class="cam-box"><img id="img-res" src="" alt="ResNet50V2"/></div><div class="cam-lbl">ResNet50V2</div></div>
+        <div><div class="cam-box"><img id="img-con" src="" alt="Consensus"/></div><div class="cam-lbl">Consensus</div></div>
+      </div>
+    </div>
+    <div class="slabel" style="color:#a78bfa;">Tumor region metrics</div>
+    <div class="metrics-grid">
+      <div class="metric-card"><div class="metric-label">Activation area</div><div class="metric-value" id="m-area-eff"></div><div class="metric-sub">EfficientNetB0</div></div>
+      <div class="metric-card"><div class="metric-label">Activation area</div><div class="metric-value" id="m-area-res"></div><div class="metric-sub">ResNet50V2</div></div>
+      <div class="metric-card"><div class="metric-label">Consensus area</div><div class="metric-value" id="m-area-con"></div><div class="metric-sub">Both models</div></div>
+      <div class="metric-card"><div class="metric-label">Lateralization</div><div class="metric-value" style="font-size:14px;" id="m-lateral"></div><div class="metric-sub">Consensus region</div></div>
+      <div class="metric-card"><div class="metric-label">Activation intensity</div><div class="metric-value" id="m-intensity-eff"></div><div class="metric-sub">EfficientNetB0</div></div>
+      <div class="metric-card"><div class="metric-label">Activation intensity</div><div class="metric-value" id="m-intensity-res"></div><div class="metric-sub">ResNet50V2</div></div>
+    </div>
+    <div class="slabel" style="color:#a78bfa;">Image quality</div>
+    <div class="metrics-grid">
+      <div class="metric-card"><div class="metric-label">Sharpness score</div><div class="metric-value" id="m-sharpness"></div><div class="metric-sub">Laplacian variance</div></div>
+      <div class="metric-card"><div class="metric-label">Contrast score</div><div class="metric-value" id="m-contrast"></div><div class="metric-sub">Pixel std deviation</div></div>
+      <div class="metric-card"><div class="metric-label">Quality flag</div><div class="metric-value" style="font-size:14px;" id="m-quality"></div><div class="metric-sub">Overall assessment</div></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-download" onclick="downloadReport()">&#11015; Download PDF Report</button>
+    </div>
+  </div>
+  <div class="footer">For research use only &nbsp;&middot;&nbsp; Not a clinical diagnostic tool &nbsp;&middot;&nbsp; BrainNet AI v2.0</div>
+</div>
+<script>
+const token = localStorage.getItem("token");
+if (!token) window.location.href = "/";
+const dname = localStorage.getItem("doctor_name");
+if (dname) document.getElementById("doctor-name").textContent = "Dr. " + dname;
+
+function logout() { localStorage.clear(); window.location.href = "/"; }
+
+let selectedFile = null;
+let lastScanId   = null;
+
+function handleFile(e) {
+  selectedFile = e.target.files[0];
+  if (!selectedFile) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById("preview").src = ev.target.result;
+    document.getElementById("preview-wrap").style.display = "block";
+  };
+  reader.readAsDataURL(selectedFile);
+  document.getElementById("predict-btn").disabled = false;
+  document.getElementById("results").style.display = "none";
+}
+
+function runPrediction(e) {
+  e.stopPropagation();
+  if (!selectedFile) return;
+  document.getElementById("spinner").style.display = "block";
+  document.getElementById("results").style.display = "none";
+  document.getElementById("predict-btn").disabled = true;
+  const fd = new FormData();
+  fd.append("file", selectedFile);
+  fetch("/scan/predict", {
+    method: "POST",
+    headers: { "Authorization": "Bearer " + token },
+    body: fd
+  })
+  .then(r => {
+    if (r.status === 401) { localStorage.clear(); window.location.href = "/"; return null; }
+    return r.json();
+  })
+  .then(data => {
+    if (!data) return;
+    document.getElementById("spinner").style.display = "none";
+    lastScanId = data.scan_id;
+    displayResults(data);
+  })
+  .catch(err => {
+    document.getElementById("spinner").style.display = "none";
+    alert("Error: " + err);
+    document.getElementById("predict-btn").disabled = false;
+  });
+}
+
+function displayResults(d) {
+  const dec = d.decision;
+  document.getElementById("diag-val").textContent  = d.final_class === "uncertain" ? "Refer to radiologist" : d.final_class;
+  document.getElementById("diag-meta").textContent = d.models_agree ? "Consensus of both models — SCC validated" : "Models disagree — spatial review required";
+  const chip = document.getElementById("agree-chip");
+  chip.className   = "agree-chip " + (d.models_agree ? "chip-yes" : "chip-no");
+  chip.textContent = d.models_agree ? "Models agree" : "Models disagree";
+
+  const sccColors = { predict:"#34d399", caution:"#fbbf24", refer:"#f87171" };
+  const sccColor  = sccColors[dec] || "#34d399";
+  const icon = document.getElementById("scc-icon");
+  icon.style.cssText = "width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:" + sccColor + "18;border:0.5px solid " + sccColor + "40;";
+  icon.textContent = dec === "predict" ? "✓" : dec === "caution" ? "!" : "✕";
+  icon.style.color = sccColor;
+  icon.style.fontSize = "20px";
+  icon.style.fontWeight = "700";
+
+  document.getElementById("scc-name").style.color    = sccColor;
+  document.getElementById("scc-name").textContent    = dec === "predict" ? "High spatial consensus — prediction is trustworthy" : dec === "caution" ? "Moderate spatial consensus — interpret with caution" : "Low spatial consensus — radiologist review recommended";
+  document.getElementById("scc-tagline").textContent = d.trust_msg;
+  document.getElementById("scc-big").style.color     = sccColor;
+  document.getElementById("scc-big").textContent     = d.scc_score.toFixed(4);
+  document.getElementById("meter-fill").style.width  = (d.scc_score * 100).toFixed(1) + "%";
+
+  document.getElementById("eff-pred").textContent = d.effnet_class;
+  document.getElementById("eff-conf").textContent = "Softmax confidence: " + d.effnet_conf + "%";
+  document.getElementById("res-pred").textContent = d.resnet_class;
+  document.getElementById("res-conf").textContent = "Softmax confidence: " + d.resnet_conf + "%";
+  renderBars("eff-bars", d.eff_probs, d.effnet_class, "eff");
+  renderBars("res-bars", d.res_probs, d.resnet_class, "res");
+
+  document.getElementById("img-orig").src = "data:image/png;base64," + d.original;
+  document.getElementById("img-eff").src  = "data:image/png;base64," + d.overlay_eff;
+  document.getElementById("img-res").src  = "data:image/png;base64," + d.overlay_res;
+  document.getElementById("img-con").src  = "data:image/png;base64," + d.consensus;
+
+  document.getElementById("m-area-eff").textContent      = d.area_eff + "%";
+  document.getElementById("m-area-res").textContent      = d.area_res + "%";
+  document.getElementById("m-area-con").textContent      = d.area_consensus + "%";
+  document.getElementById("m-lateral").textContent       = d.lateral_con;
+  document.getElementById("m-intensity-eff").textContent = d.intensity_eff;
+  document.getElementById("m-intensity-res").textContent = d.intensity_res;
+  document.getElementById("m-sharpness").textContent     = d.sharpness;
+  document.getElementById("m-contrast").textContent      = d.contrast;
+  const qEl = document.getElementById("m-quality");
+  qEl.textContent = d.quality_flag;
+  qEl.className   = "metric-value " + (d.quality_flag === "Good" ? "quality-good" : "quality-low");
+
+  document.getElementById("results").style.display = "block";
+  document.getElementById("predict-btn").disabled  = false;
+  document.getElementById("results").scrollIntoView({ behavior: "smooth" });
+}
+
+function renderBars(id, probs, topClass, type) {
+  const el = document.getElementById(id);
+  el.innerHTML = "";
+  Object.entries(probs).sort((a,b) => b[1]-a[1]).forEach(([cls, val]) => {
+    const isTop = cls === topClass;
+    el.innerHTML += "<div class='brow'><div class='brow-top'><span>" + cls + "</span><span>" + val + "%</span></div><div class='bbg'><div class='" + (isTop?"bfill-"+type:"bdim-"+type) + "' style='width:" + Math.max(val,0.3) + "%'></div></div></div>";
+  });
+}
+
+function downloadReport() {
+  if (!lastScanId) { alert("No scan to download."); return; }
+  window.open("/scan/report/" + lastScanId + "?token=" + token, "_blank");
+}
+
+const dz = document.getElementById("drop-zone");
+dz.addEventListener("dragover",  e => { e.preventDefault(); dz.classList.add("dragover"); });
+dz.addEventListener("dragleave", () => dz.classList.remove("dragover"));
+dz.addEventListener("drop", e => {
+  e.preventDefault();
+  dz.classList.remove("dragover");
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  selectedFile = file;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById("preview").src = ev.target.result;
+    document.getElementById("preview-wrap").style.display = "block";
+  };
+  reader.readAsDataURL(file);
+  document.getElementById("predict-btn").disabled = false;
+});
+</script>
+</body>
+</html>

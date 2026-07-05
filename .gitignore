@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# ML Models — too large for GitHub
+*.keras
+*.h5
+*.pkl
+*.pt
+*.pth
+
+# Database — personal data
+*.db
+*.sqlite3
+
+# Uploaded scans and reports — patient data
+static/uploads/
+static/reports/
+
+# Environment
+.env
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Logs
+*.log
+/tmp/
+
+# OS
+.DS_Store
+Thumbs.db
