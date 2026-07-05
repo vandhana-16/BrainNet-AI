@@ -58,3 +58,13 @@ SCC measures the Intersection over Union (IoU) of GradCAM++ heatmaps from two ar
 - 15.5 percentage point gap proves SCC outperforms softmax confidence
 
 > For research use only. Not a clinical diagnostic tool.
+
+## Live Demo
+Deployed on Google Colab + ngrok.
+Run the notebook to start the server.
+
+## How to Run
+1. Open Google Colab
+2. Mount Google Drive
+3. Run all cells in order
+4. Open the ngrok URL printed at the end
